@@ -1,0 +1,22 @@
+#!/bin/sh
+
+set -eu
+export LC_ALL=C
+
+DOCKER_COMPOSE_CMD=/usr/local/bin/docker-compose
+DOCKER_COMPOSE_TMPDIR=$(mktemp -d); trap 'rm -rf "${DOCKER_COMPOSE_TMPDIR}"' EXIT
+DOCKER_COMPOSE_BINARY="docker-compose-$(uname -s)-$(uname -m)"
+DOCKER_COMPOSE_BINARY_URL=$(curl -fsSNL 'https://api.github.com/repos/docker/compose/releases/latest' \
+	| grep -om1 "https://github.com/docker/compose/releases/download/[^\"]*/${DOCKER_COMPOSE_BINARY}" \
+)
+DOCKER_COMPOSE_CHECKSUM_URL="${DOCKER_COMPOSE_BINARY_URL}.sha256"
+
+curl -L "${DOCKER_COMPOSE_BINARY_URL}" -o "${DOCKER_COMPOSE_TMPDIR}/${DOCKER_COMPOSE_BINARY}"
+curl -L "${DOCKER_COMPOSE_CHECKSUM_URL}" -o "${DOCKER_COMPOSE_TMPDIR}/${DOCKER_COMPOSE_BINARY}.sha256"
+
+(cd "${DOCKER_COMPOSE_TMPDIR}" && sha256sum -c "${DOCKER_COMPOSE_BINARY}.sha256" || exit 1)
+
+mv "${DOCKER_COMPOSE_TMPDIR}/${DOCKER_COMPOSE_BINARY}" "${DOCKER_COMPOSE_CMD}"
+chown root:root "${DOCKER_COMPOSE_CMD}"
+chmod 755 "${DOCKER_COMPOSE_CMD}"
+"${DOCKER_COMPOSE_CMD}" --version

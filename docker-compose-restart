@@ -1,0 +1,9 @@
+#!/bin/sh
+
+set -eu
+export LC_ALL=C
+
+docker-compose stop --timeout 10
+docker-compose rm --force -v
+docker-compose up --detach
+docker-compose logs --follow

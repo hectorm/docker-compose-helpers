@@ -1,0 +1,6 @@
+#!/bin/sh
+
+set -eu
+export LC_ALL=C
+
+docker-compose logs --follow

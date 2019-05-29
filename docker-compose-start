@@ -1,0 +1,7 @@
+#!/bin/sh
+
+set -eu
+export LC_ALL=C
+
+docker-compose up --detach
+docker-compose logs --follow

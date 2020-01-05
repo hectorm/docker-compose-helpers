@@ -4,4 +4,4 @@ set -eu
 export LC_ALL=C
 
 docker-compose up --detach
-docker-compose logs --follow
+if [ -t 1 ]; then docker-compose-logs; fi

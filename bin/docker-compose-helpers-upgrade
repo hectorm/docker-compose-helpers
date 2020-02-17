@@ -1,0 +1,26 @@
+#!/bin/sh
+
+set -eu
+export LC_ALL=C
+
+BASE_URL='https://raw.githubusercontent.com/hectorm/docker-compose-helpers/master'
+BIN_DIR=/usr/local/bin
+SYSTEMDUNIT_DIR=/etc/systemd/system
+
+curl \
+	--proto '=https' --tlsv1.2 \
+	--output "${BIN_DIR:?}/docker-compose-#1" \
+	"${BASE_URL:?}/bin/docker-compose-{restart,start,stop,upgrade,helpers-upgrade}"
+
+chown root:root "${BIN_DIR:?}"/docker-compose*
+chmod 755 "${BIN_DIR:?}"/docker-compose*
+
+curl \
+	--proto '=https' --tlsv1.2 \
+	--output "${SYSTEMDUNIT_DIR:?}/#1" \
+	"${BASE_URL:?}/service/{docker-compose@.service}"
+
+chown root:root "${SYSTEMDUNIT_DIR:?}"/docker-compose*
+chmod 644 "${SYSTEMDUNIT_DIR:?}"/docker-compose*
+
+systemctl daemon-reload 2>/dev/null ||:

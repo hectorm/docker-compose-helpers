@@ -15,12 +15,14 @@ curl \
 chown root:root "${BIN_DIR:?}"/docker-compose*
 chmod 755 "${BIN_DIR:?}"/docker-compose*
 
-curl \
-	--proto '=https' --tlsv1.2 \
-	--output "${SYSTEMDUNIT_DIR:?}/#1" \
-	"${BASE_URL:?}/service/{docker-compose@.service}"
+if [ -d "${SYSTEMDUNIT_DIR:?}" ]; then
+	curl \
+		--proto '=https' --tlsv1.2 \
+		--output "${SYSTEMDUNIT_DIR:?}/#1" \
+		"${BASE_URL:?}/service/{docker-compose@.service}"
 
-chown root:root "${SYSTEMDUNIT_DIR:?}"/docker-compose*
-chmod 644 "${SYSTEMDUNIT_DIR:?}"/docker-compose*
+	chown root:root "${SYSTEMDUNIT_DIR:?}"/docker-compose*
+	chmod 644 "${SYSTEMDUNIT_DIR:?}"/docker-compose*
 
-systemctl daemon-reload 2>/dev/null ||:
+	systemctl daemon-reload 2>/dev/null ||:
+fi

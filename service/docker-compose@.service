@@ -1,7 +1,7 @@
 [Unit]
 Description=docker-compose %i service
-Requires=docker.service network-online.target
-After=docker.service network-online.target
+Wants=docker.service
+After=docker.service
 
 [Service]
 Type=simple
@@ -9,8 +9,8 @@ WorkingDirectory=/etc/docker-compose/%i
 ExecStart=/usr/local/bin/docker-compose up --abort-on-container-exit
 ExecStop=/usr/local/bin/docker-compose rm --force --stop -v
 Restart=always
-RestartSec=10s
-TimeoutSec=30min
+RestartSec=60s
+TimeoutSec=180s
 
 [Install]
 WantedBy=multi-user.target

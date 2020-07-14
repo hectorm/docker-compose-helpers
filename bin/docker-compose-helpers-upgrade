@@ -8,7 +8,9 @@ BIN_DIR=/usr/local/bin
 SYSTEMDUNIT_DIR=/etc/systemd/system
 
 curl --proto '=https' --tlsv1.2 -L \
-	-o "${BIN_DIR:?}/#1-#2" "${BASE_URL:?}/bin/{docker-compose}-{restart,start,stop,upgrade,helpers-upgrade}"
+	-o "${BIN_DIR:?}/#1-#2" "${BASE_URL:?}/bin/{docker-compose}-{restart,start,stop}" \
+	-o "${BIN_DIR:?}/#1-#2" "${BASE_URL:?}/bin/{docker-compose}-{upgrade}" \
+	-o "${BIN_DIR:?}/#1-#2" "${BASE_URL:?}/bin/{docker-compose}-{helpers-upgrade}"
 
 chown root:root "${BIN_DIR:?}"/docker-compose*
 chmod 755 "${BIN_DIR:?}"/docker-compose*

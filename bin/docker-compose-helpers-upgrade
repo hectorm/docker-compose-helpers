@@ -4,27 +4,39 @@ set -eu
 export LC_ALL=C
 
 BASE_URL='https://raw.githubusercontent.com/hectorm/docker-compose-helpers/master'
+
 BIN_DIR=/usr/local/bin
 SYSTEMDUNIT_DIR=/etc/systemd/system
 
-curl --proto '=https' --tlsv1.2 -L \
-	-o "${BIN_DIR:?}/#1-#2" "${BASE_URL:?}/bin/{docker-compose}-{restart,start,stop}" \
-	-o "${BIN_DIR:?}/#1-#2" "${BASE_URL:?}/bin/{docker-compose}-{upgrade}" \
-	-o "${BIN_DIR:?}/#1-#2" "${BASE_URL:?}/bin/{docker-compose}-{helpers-upgrade}"
+TMP_DIR=$(mktemp -d)
+trap 'rm -rf "${TMP_DIR:?}"; trap - EXIT' EXIT TERM INT HUP
 
-chown root:root "${BIN_DIR:?}"/docker-compose*
-chmod 755 "${BIN_DIR:?}"/docker-compose*
-
-if [ -d "${SYSTEMDUNIT_DIR:?}" ]; then
+main() {
+	mkdir -p "${TMP_DIR:?}"/bin/
 	curl --proto '=https' --tlsv1.2 -L \
-		-o "${SYSTEMDUNIT_DIR:?}/#1.#2" "${BASE_URL:?}/systemd/{docker-compose@}.{service}" \
-		-o "${SYSTEMDUNIT_DIR:?}/#1.#2" "${BASE_URL:?}/systemd/{docker-compose-upgrade}.{service,timer}" \
-		-o "${SYSTEMDUNIT_DIR:?}/#1.#2" "${BASE_URL:?}/systemd/{docker-compose-helpers-upgrade}.{service,timer}"
+		-o "${TMP_DIR:?}"/bin/'#1-#2' "${BASE_URL:?}"/bin/'{docker-compose}-{restart,start,stop}' \
+		-o "${TMP_DIR:?}"/bin/'#1-#2' "${BASE_URL:?}"/bin/'{docker-compose}-{upgrade}' \
+		-o "${TMP_DIR:?}"/bin/'#1-#2' "${BASE_URL:?}"/bin/'{docker-compose}-{helpers-upgrade}'
 
-	chown root:root "${SYSTEMDUNIT_DIR:?}"/docker-compose*
-	chmod 644 "${SYSTEMDUNIT_DIR:?}"/docker-compose*
+	mv -f "${TMP_DIR:?}"/bin/* "${BIN_DIR:?}"/
+	chown root:root "${BIN_DIR:?}"/docker-compose*
+	chmod 755 "${BIN_DIR:?}"/docker-compose*
 
-	systemctl daemon-reload 2>/dev/null ||:
-	systemctl enable --now docker-compose-upgrade.timer 2>/dev/null ||:
-	systemctl enable --now docker-compose-helpers-upgrade.timer 2>/dev/null ||:
-fi
+	if [ -d "${SYSTEMDUNIT_DIR:?}" ]; then
+		mkdir -p "${TMP_DIR:?}"/systemd/
+		curl --proto '=https' --tlsv1.2 -L \
+			-o "${TMP_DIR:?}"/systemd/'#1.#2' "${BASE_URL:?}"/systemd/'{docker-compose@}.{service}' \
+			-o "${TMP_DIR:?}"/systemd/'#1.#2' "${BASE_URL:?}"/systemd/'{docker-compose-upgrade}.{service,timer}' \
+			-o "${TMP_DIR:?}"/systemd/'#1.#2' "${BASE_URL:?}"/systemd/'{docker-compose-helpers-upgrade}.{service,timer}'
+
+		mv -f "${TMP_DIR:?}"/systemd/* "${SYSTEMDUNIT_DIR:?}"/
+		chown root:root "${SYSTEMDUNIT_DIR:?}"/docker-compose*
+		chmod 644 "${SYSTEMDUNIT_DIR:?}"/docker-compose*
+
+		systemctl daemon-reload 2>/dev/null ||:
+		systemctl enable --now docker-compose-upgrade.timer 2>/dev/null ||:
+		systemctl enable --now docker-compose-helpers-upgrade.timer 2>/dev/null ||:
+	fi
+}
+
+main "$@"

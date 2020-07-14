@@ -4,21 +4,23 @@ set -eu
 export LC_ALL=C
 
 DOCKER_COMPOSE_CMD=/usr/local/bin/docker-compose
-
-DOCKER_COMPOSE_TMPDIR=$(mktemp -d)
-trap 'rm -rf "${DOCKER_COMPOSE_TMPDIR:?}"' EXIT
-
 DOCKER_COMPOSE_BINARY_NAME="docker-compose-$(uname -s)-$(uname -m)"
 DOCKER_COMPOSE_BINARY_URL="https://github.com/docker/compose/releases/latest/download/${DOCKER_COMPOSE_BINARY_NAME:?}"
 
-curl --proto '=https' --tlsv1.2 -Lo "${DOCKER_COMPOSE_TMPDIR:?}/${DOCKER_COMPOSE_BINARY_NAME:?}" "${DOCKER_COMPOSE_BINARY_URL:?}"
-curl --proto '=https' --tlsv1.2 -Lo "${DOCKER_COMPOSE_TMPDIR:?}/${DOCKER_COMPOSE_BINARY_NAME:?}.sha256" "${DOCKER_COMPOSE_BINARY_URL:?}.sha256"
+TMP_DIR=$(mktemp -d)
+trap 'rm -rf "${TMP_DIR:?}"; trap - EXIT' EXIT TERM INT HUP
 
-(cd "${DOCKER_COMPOSE_TMPDIR:?}" && sha256sum -c "${DOCKER_COMPOSE_BINARY_NAME:?}.sha256" || exit 1)
+main() {
+	curl --proto '=https' --tlsv1.2 -Lo "${TMP_DIR:?}/${DOCKER_COMPOSE_BINARY_NAME:?}" "${DOCKER_COMPOSE_BINARY_URL:?}"
+	curl --proto '=https' --tlsv1.2 -Lo "${TMP_DIR:?}/${DOCKER_COMPOSE_BINARY_NAME:?}.sha256" "${DOCKER_COMPOSE_BINARY_URL:?}.sha256"
 
-mv -fv "${DOCKER_COMPOSE_TMPDIR:?}/${DOCKER_COMPOSE_BINARY_NAME:?}" "${DOCKER_COMPOSE_CMD:?}"
+	(cd "${TMP_DIR:?}" && sha256sum -c "${DOCKER_COMPOSE_BINARY_NAME:?}.sha256" || exit 1)
 
-chown root:root "${DOCKER_COMPOSE_CMD:?}"
-chmod 755 "${DOCKER_COMPOSE_CMD:?}"
+	mv -f "${TMP_DIR:?}/${DOCKER_COMPOSE_BINARY_NAME:?}" "${DOCKER_COMPOSE_CMD:?}"
+	chown root:root "${DOCKER_COMPOSE_CMD:?}"
+	chmod 755 "${DOCKER_COMPOSE_CMD:?}"
 
-"${DOCKER_COMPOSE_CMD:?}" --version
+	"${DOCKER_COMPOSE_CMD:?}" --version
+}
+
+main "$@"

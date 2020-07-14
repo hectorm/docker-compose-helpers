@@ -7,17 +7,17 @@ BASE_URL='https://raw.githubusercontent.com/hectorm/docker-compose-helpers/maste
 BIN_DIR=/usr/local/bin
 SYSTEMDUNIT_DIR=/etc/systemd/system
 
-curl --proto '=https' --tlsv1.2 -Lo "${BIN_DIR:?}/docker-compose-#1" \
-	"${BASE_URL:?}/bin/docker-compose-{restart,start,stop,upgrade,helpers-upgrade}"
+curl --proto '=https' --tlsv1.2 -L \
+	-o "${BIN_DIR:?}/#1-#2" "${BASE_URL:?}/bin/{docker-compose}-{restart,start,stop,upgrade,helpers-upgrade}"
 
 chown root:root "${BIN_DIR:?}"/docker-compose*
 chmod 755 "${BIN_DIR:?}"/docker-compose*
 
 if [ -d "${SYSTEMDUNIT_DIR:?}" ]; then
-	curl --proto '=https' --tlsv1.2 -Lo "${SYSTEMDUNIT_DIR:?}/#1" \
-		"${BASE_URL:?}/systemd/docker-compose@.service" \
-		"${BASE_URL:?}/systemd/docker-compose-upgrade.{service,timer}"
-		"${BASE_URL:?}/systemd/docker-compose-helpers-upgrade.{service,timer}"
+	curl --proto '=https' --tlsv1.2 -L \
+		-o "${SYSTEMDUNIT_DIR:?}/#1.#2" "${BASE_URL:?}/systemd/{docker-compose@}.{service}" \
+		-o "${SYSTEMDUNIT_DIR:?}/#1.#2" "${BASE_URL:?}/systemd/{docker-compose-upgrade}.{service,timer}" \
+		-o "${SYSTEMDUNIT_DIR:?}/#1.#2" "${BASE_URL:?}/systemd/{docker-compose-helpers-upgrade}.{service,timer}"
 
 	chown root:root "${SYSTEMDUNIT_DIR:?}"/docker-compose*
 	chmod 644 "${SYSTEMDUNIT_DIR:?}"/docker-compose*

@@ -6,8 +6,8 @@ After=docker.service
 [Service]
 Type=simple
 WorkingDirectory=/etc/docker-compose/%i
-ExecStart=/usr/local/bin/docker-compose up --abort-on-container-exit
-ExecStop=/usr/local/bin/docker-compose rm --force --stop -v
+ExecStart=/bin/sh -c 'docker-compose up --abort-on-container-exit'
+ExecStop=/bin/sh -c 'docker-compose rm --force --stop -v'
 Restart=always
 RestartSec=60s
 TimeoutSec=180s

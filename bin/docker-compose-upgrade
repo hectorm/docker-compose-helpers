@@ -8,7 +8,7 @@ DOCKER_COMPOSE_BINARY_NAME="docker-compose-$(uname -s)-$(uname -m)"
 DOCKER_COMPOSE_BINARY_URL="https://github.com/docker/compose/releases/latest/download/${DOCKER_COMPOSE_BINARY_NAME:?}"
 
 TMP_DIR=$(mktemp -d)
-trap 'rm -rf "${TMP_DIR:?}"; trap - EXIT' EXIT TERM INT HUP
+trap 'rm -rf "${TMP_DIR:?}"; trap - EXIT; exit 0' EXIT TERM INT HUP
 
 main() {
 	curl --proto '=https' --tlsv1.2 -Lo "${TMP_DIR:?}/${DOCKER_COMPOSE_BINARY_NAME:?}" "${DOCKER_COMPOSE_BINARY_URL:?}"

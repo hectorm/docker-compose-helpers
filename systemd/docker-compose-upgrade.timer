@@ -4,7 +4,7 @@ Wants=docker.service
 After=docker.service
 
 [Timer]
-OnCalendar=Mon *-*-* 00:30:00
+OnCalendar=*-*-* 00:30:00
 RandomizedDelaySec=10m
 Persistent=true
 Unit=docker-compose-upgrade.service

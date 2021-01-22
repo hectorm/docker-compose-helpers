@@ -9,7 +9,8 @@ BIN_DIR=/usr/local/bin
 SYSTEMDUNIT_DIR=/etc/systemd/system
 
 TMP_DIR=$(mktemp -d)
-trap 'rm -rf "${TMP_DIR:?}"; trap - EXIT; exit 0' EXIT TERM INT HUP
+# shellcheck disable=SC2154
+trap 'ret="$?"; rm -rf -- "${TMP_DIR:?}"; trap - EXIT; exit "${ret:?}"' EXIT TERM INT HUP
 
 main() {
 	mkdir "${TMP_DIR:?}"/bin/

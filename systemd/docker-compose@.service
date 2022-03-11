@@ -9,8 +9,8 @@ WorkingDirectory=/etc/docker-compose/%i
 ExecStart=/bin/sh -c 'docker-compose up'
 ExecStop=/bin/sh -c 'docker-compose rm --force --stop -v'
 Restart=always
-RestartSec=60s
-TimeoutSec=180s
+RestartSec=10s
+TimeoutStopSec=60s
 
 [Install]
 WantedBy=multi-user.target

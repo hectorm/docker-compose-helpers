@@ -1,7 +1,0 @@
-[Unit]
-Description=Upgrade Docker Compose
-
-[Service]
-Type=oneshot
-TimeoutSec=5m
-ExecStart=/usr/local/bin/docker-compose-upgrade

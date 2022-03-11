@@ -16,7 +16,6 @@ main() {
 	mkdir "${TMP_DIR:?}"/bin/
 	curl --proto '=https' --tlsv1.2 -L \
 		-o "${TMP_DIR:?}"/bin/'#1-#2' "${BASE_URL:?}"/bin/'{docker-compose}-{restart,start,stop}' \
-		-o "${TMP_DIR:?}"/bin/'#1-#2' "${BASE_URL:?}"/bin/'{docker-compose}-{upgrade}' \
 		-o "${TMP_DIR:?}"/bin/'#1-#2' "${BASE_URL:?}"/bin/'{docker-compose}-{helpers-upgrade}'
 
 	mv -f "${TMP_DIR:?}"/bin/* "${BIN_DIR:?}"/
@@ -27,7 +26,6 @@ main() {
 		mkdir "${TMP_DIR:?}"/systemd/
 		curl --proto '=https' --tlsv1.2 -L \
 			-o "${TMP_DIR:?}"/systemd/'#1.#2' "${BASE_URL:?}"/systemd/'{docker-compose@}.{service}' \
-			-o "${TMP_DIR:?}"/systemd/'#1.#2' "${BASE_URL:?}"/systemd/'{docker-compose-upgrade}.{service,timer}' \
 			-o "${TMP_DIR:?}"/systemd/'#1.#2' "${BASE_URL:?}"/systemd/'{docker-compose-helpers-upgrade}.{service,timer}'
 
 		mv -f "${TMP_DIR:?}"/systemd/* "${SYSTEMDUNIT_DIR:?}"/
@@ -35,7 +33,6 @@ main() {
 		chmod 644 "${SYSTEMDUNIT_DIR:?}"/docker-compose*
 
 		systemctl daemon-reload 2>/dev/null ||:
-		systemctl enable --now docker-compose-upgrade.timer 2>/dev/null ||:
 		systemctl enable --now docker-compose-helpers-upgrade.timer 2>/dev/null ||:
 	fi
 }

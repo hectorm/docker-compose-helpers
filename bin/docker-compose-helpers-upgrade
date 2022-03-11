@@ -35,6 +35,7 @@ main() {
 		chmod 644 "${SYSTEMDUNIT_DIR:?}"/docker-compose@.* "${SYSTEMDUNIT_DIR:?}"/docker-compose-helpers-upgrade.*
 
 		rm -f "${SYSTEMDUNIT_DIR:?}"/docker-compose-upgrade.*
+		rm -f "${SYSTEMDUNIT_DIR:?}"/timers.target.wants/docker-compose-upgrade.timer
 
 		systemctl daemon-reload 2>/dev/null ||:
 	fi

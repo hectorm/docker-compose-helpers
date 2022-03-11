@@ -22,6 +22,8 @@ main() {
 	chown root:root "${BIN_DIR:?}"/docker-compose-*
 	chmod 755 "${BIN_DIR:?}"/docker-compose-*
 
+	rm -f "${BIN_DIR:?}"/docker-compose-upgrade
+
 	if [ -d "${SYSTEMDUNIT_DIR:?}" ]; then
 		mkdir "${TMP_DIR:?}"/systemd/
 		curl --proto '=https' --tlsv1.3 -L \
@@ -31,6 +33,8 @@ main() {
 		mv -f "${TMP_DIR:?}"/systemd/* "${SYSTEMDUNIT_DIR:?}"/
 		chown root:root "${SYSTEMDUNIT_DIR:?}"/docker-compose@.* "${SYSTEMDUNIT_DIR:?}"/docker-compose-helpers-upgrade.*
 		chmod 644 "${SYSTEMDUNIT_DIR:?}"/docker-compose@.* "${SYSTEMDUNIT_DIR:?}"/docker-compose-helpers-upgrade.*
+
+		rm -f "${SYSTEMDUNIT_DIR:?}"/docker-compose-upgrade.*
 
 		systemctl daemon-reload 2>/dev/null ||:
 	fi

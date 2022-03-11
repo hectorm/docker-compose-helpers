@@ -29,8 +29,9 @@ main() {
 			-o "${TMP_DIR:?}"/systemd/'#1.#2' "${BASE_URL:?}"/systemd/'{docker-compose-helpers-upgrade}.{service,timer}'
 
 		mv -f "${TMP_DIR:?}"/systemd/* "${SYSTEMDUNIT_DIR:?}"/
-		chown root:root "${SYSTEMDUNIT_DIR:?}"/docker-compose-*
-		chmod 644 "${SYSTEMDUNIT_DIR:?}"/docker-compose-*
+		chown root:root "${SYSTEMDUNIT_DIR:?}"/docker-compose@.* "${SYSTEMDUNIT_DIR:?}"/docker-compose-helpers-upgrade.*
+		chmod 644 "${SYSTEMDUNIT_DIR:?}"/docker-compose@.* "${SYSTEMDUNIT_DIR:?}"/docker-compose-helpers-upgrade.*
+
 		systemctl daemon-reload 2>/dev/null ||:
 	fi
 }

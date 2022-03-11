@@ -6,8 +6,8 @@ After=docker.service
 [Service]
 Type=simple
 WorkingDirectory=/etc/docker-compose/%i
-ExecStart=/bin/sh -c 'docker-compose up'
-ExecStop=/bin/sh -c 'docker-compose rm --force --stop -v'
+ExecStart=/usr/local/bin/docker-compose-start
+ExecStop=/usr/local/bin/docker-compose-stop
 Restart=always
 RestartSec=10s
 TimeoutStopSec=60s

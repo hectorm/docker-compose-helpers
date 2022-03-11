@@ -3,5 +3,15 @@
 set -eu
 export LC_ALL=C
 
-docker-compose up --detach
-if [ -t 1 ]; then docker-compose logs --follow; fi
+if docker compose version >/dev/null 2>&1; then
+	COMPOSE='docker compose'
+else
+	COMPOSE='docker-compose'
+fi
+
+if [ -t 1 ]; then
+	${COMPOSE:?} up -d "${@}"
+	exec ${COMPOSE:?} logs -f
+else
+	exec ${COMPOSE:?} up "${@}"
+fi

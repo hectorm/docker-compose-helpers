@@ -9,6 +9,12 @@ else
 	COMPOSE='docker-compose'
 fi
 
+HOST_HOSTNAME="$(uname -n)"
+export HOST_HOSTNAME
+
+HOST_VIRTUALIZATION="$(systemd-detect-virt -v ||:)"
+export HOST_VIRTUALIZATION
+
 if [ -t 1 ]; then
 	${COMPOSE:?} up -d "${@}"
 	exec ${COMPOSE:?} logs -f

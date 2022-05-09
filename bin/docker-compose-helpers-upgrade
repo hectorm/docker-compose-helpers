@@ -24,9 +24,8 @@ main() {
 
 	if command -v semanage >/dev/null 2>&1 && command -v restorecon >/dev/null 2>&1; then
 		for f in "${BIN_DIR:?}"/docker-compose-*; do
-			if semanage fcontext -at bin_t "${f:?}" 2>/dev/null; then
-				restorecon -Fv "${f:?}"
-			fi
+			semanage fcontext -at bin_t "${f:?}" 2>/dev/null ||:
+			restorecon -Fv "${f:?}"
 		done
 	fi
 

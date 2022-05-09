@@ -22,7 +22,13 @@ main() {
 	chown root:root "${BIN_DIR:?}"/docker-compose-*
 	chmod 755 "${BIN_DIR:?}"/docker-compose-*
 
-	rm -f "${BIN_DIR:?}"/docker-compose-upgrade
+	if command -v semanage >/dev/null 2>&1 && command -v restorecon >/dev/null 2>&1; then
+		for f in "${BIN_DIR:?}"/docker-compose-*; do
+			if semanage fcontext -at bin_t "${f:?}" 2>/dev/null; then
+				restorecon -Fv "${f:?}"
+			fi
+		done
+	fi
 
 	if [ -d "${SYSTEMDUNIT_DIR:?}" ]; then
 		mkdir "${TMP_DIR:?}"/systemd/
@@ -33,9 +39,6 @@ main() {
 		mv -f "${TMP_DIR:?}"/systemd/* "${SYSTEMDUNIT_DIR:?}"/
 		chown root:root "${SYSTEMDUNIT_DIR:?}"/docker-compose@.* "${SYSTEMDUNIT_DIR:?}"/docker-compose-helpers-upgrade.*
 		chmod 644 "${SYSTEMDUNIT_DIR:?}"/docker-compose@.* "${SYSTEMDUNIT_DIR:?}"/docker-compose-helpers-upgrade.*
-
-		rm -f "${SYSTEMDUNIT_DIR:?}"/docker-compose-upgrade.*
-		rm -f "${SYSTEMDUNIT_DIR:?}"/timers.target.wants/docker-compose-upgrade.timer
 
 		systemctl daemon-reload 2>/dev/null ||:
 	fi

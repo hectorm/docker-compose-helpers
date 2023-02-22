@@ -9,7 +9,7 @@ else
 	COMPOSE='docker-compose'
 fi
 
-HOST_HOSTNAME="$(uname -n)"
+HOST_HOSTNAME="$(hostname -f || uname -n)"
 export HOST_HOSTNAME
 
 HOST_VIRTUALIZATION="$(systemd-detect-virt -v ||:)"

@@ -9,4 +9,5 @@ else
 	COMPOSE='docker-compose'
 fi
 
-exec ${COMPOSE:?} rm -s -v -f
+${COMPOSE:?} stop
+exec ${COMPOSE:?} rm -v -f

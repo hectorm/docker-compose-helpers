@@ -22,11 +22,9 @@ main() {
 	chown root:root "${BIN_DIR:?}"/docker-compose-*
 	chmod 755 "${BIN_DIR:?}"/docker-compose-*
 
-	if command -v semanage >/dev/null 2>&1 && command -v restorecon >/dev/null 2>&1; then
-		for f in "${BIN_DIR:?}"/docker-compose-*; do
-			semanage fcontext -at bin_t "${f:?}" 2>/dev/null ||:
-			restorecon -Fv "${f:?}"
-		done
+	if command -v semanage >/dev/null && command -v restorecon >/dev/null; then
+		semanage fcontext -at bin_t "${BIN_DIR:?}"/docker-compose-'(.*)' 2>/dev/null ||:
+		restorecon -Fv "${BIN_DIR:?}"/docker-compose-*
 	fi
 
 	if [ -d "${SYSTEMDUNIT_DIR:?}" ]; then
@@ -37,6 +35,10 @@ main() {
 		mv -f "${TMP_DIR:?}"/systemd/* "${SYSTEMDUNIT_DIR:?}"/
 		chown root:root "${SYSTEMDUNIT_DIR:?}"/docker-compose@.service
 		chmod 644 "${SYSTEMDUNIT_DIR:?}"/docker-compose@.service
+
+		if command -v semanage >/dev/null && command -v restorecon >/dev/null; then
+			restorecon -Fv "${SYSTEMDUNIT_DIR:?}"/docker-compose@.service
+		fi
 
 		systemctl daemon-reload 2>/dev/null ||:
 	fi

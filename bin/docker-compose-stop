@@ -3,11 +3,5 @@
 set -eu
 export LC_ALL=C
 
-if docker compose version >/dev/null 2>&1; then
-	COMPOSE='docker compose'
-else
-	COMPOSE='docker-compose'
-fi
-
-${COMPOSE:?} stop
-exec ${COMPOSE:?} rm -v -f
+docker compose stop "${@}"
+exec docker compose rm --volumes --force

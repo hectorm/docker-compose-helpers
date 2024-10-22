@@ -10,7 +10,10 @@ ExecStart=/usr/local/bin/docker-compose-start
 ExecStop=/usr/local/bin/docker-compose-stop
 Restart=always
 RestartSec=10s
-TimeoutStopSec=60s
+WatchdogSec=120s
+WatchdogSignal=SIGTERM
+NotifyAccess=all
+TimeoutStopSec=120s
 
 [Install]
 WantedBy=multi-user.target

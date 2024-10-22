@@ -3,21 +3,27 @@
 set -eu
 export LC_ALL=C
 
-if docker compose version >/dev/null 2>&1; then
-	COMPOSE='docker compose'
-else
-	COMPOSE='docker-compose'
-fi
-
 HOST_HOSTNAME="$(hostname -f || uname -n)"
 export HOST_HOSTNAME
 
 HOST_VIRTUALIZATION="$(systemd-detect-virt -v ||:)"
 export HOST_VIRTUALIZATION
 
-if [ -t 1 ]; then
-	${COMPOSE:?} up -d "${@}"
-	exec ${COMPOSE:?} logs -f
+if [ -n "${WATCHDOG_PID-}" ] && [ -n "${WATCHDOG_USEC-}" ] && [ -n "${NOTIFY_SOCKET-}" ]; then
+	project="$(docker compose config | awk '/^name:/{print($2)}')"
+	while true; do
+		unhealthy="$(docker container ps --format '{{.Names}}' \
+			--filter "label=com.docker.compose.project=${project:?}" \
+			--filter 'health=unhealthy' | tr -s '\n' ' ')"
+		if [ -z "${unhealthy-}" ]; then systemd-notify WATCHDOG=1
+		else printf 'Unhealthy services: %s\n' "${unhealthy:?}"; fi
+		sleep "$((WATCHDOG_USEC / 2000000))"
+	done &
+	systemd-notify READY=1
+	docker compose up "${@}"
+elif [ -t 1 ]; then
+	docker compose up --detach "${@}"
+	exec docker compose logs --follow
 else
-	exec ${COMPOSE:?} up "${@}"
+	exec docker compose up "${@}"
 fi

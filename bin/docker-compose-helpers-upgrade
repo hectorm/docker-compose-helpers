@@ -15,7 +15,7 @@ trap 'ret="$?"; rm -rf -- "${TMP_DIR:?}"; trap - EXIT; exit "${ret:?}"' EXIT TER
 main() {
 	mkdir "${TMP_DIR:?}"/bin/
 	curl --proto '=https' --tlsv1.3 -L \
-		-o "${TMP_DIR:?}"/bin/'#1-#2' "${BASE_URL:?}"/bin/'{docker-compose}-{restart,start,stop}' \
+		-o "${TMP_DIR:?}"/bin/'#1-#2' "${BASE_URL:?}"/bin/'{docker-compose}-{restart,start,stop,backup,restic}' \
 		-o "${TMP_DIR:?}"/bin/'#1-#2' "${BASE_URL:?}"/bin/'{docker-compose}-{helpers-upgrade}'
 
 	mv -f "${TMP_DIR:?}"/bin/* "${BIN_DIR:?}"/
@@ -30,14 +30,15 @@ main() {
 	if [ -d "${SYSTEMDUNIT_DIR:?}" ]; then
 		mkdir "${TMP_DIR:?}"/systemd/
 		curl --proto '=https' --tlsv1.3 -L \
-			-o "${TMP_DIR:?}"/systemd/'#1.#2' "${BASE_URL:?}"/systemd/'{docker-compose@}.{service}'
+			-o "${TMP_DIR:?}"/systemd/'#1.#2' "${BASE_URL:?}"/systemd/'{docker-compose@}.{service}' \
+			-o "${TMP_DIR:?}"/systemd/'#1.#2' "${BASE_URL:?}"/systemd/'{docker-compose-backup@}.{service,timer}'
 
 		mv -f "${TMP_DIR:?}"/systemd/* "${SYSTEMDUNIT_DIR:?}"/
-		chown root:root "${SYSTEMDUNIT_DIR:?}"/docker-compose@.service
-		chmod 644 "${SYSTEMDUNIT_DIR:?}"/docker-compose@.service
+		chown root:root "${SYSTEMDUNIT_DIR:?}"/docker-compose@.* "${SYSTEMDUNIT_DIR:?}"/docker-compose-*@.*
+		chmod 644 "${SYSTEMDUNIT_DIR:?}"/docker-compose@.* "${SYSTEMDUNIT_DIR:?}"/docker-compose-*@.*
 
 		if command -v semanage >/dev/null && command -v restorecon >/dev/null; then
-			restorecon -Fv "${SYSTEMDUNIT_DIR:?}"/docker-compose@.service
+			restorecon -Fv "${SYSTEMDUNIT_DIR:?}"/docker-compose@.* "${SYSTEMDUNIT_DIR:?}"/docker-compose-*@.*
 		fi
 
 		systemctl daemon-reload 2>/dev/null ||:

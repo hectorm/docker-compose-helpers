@@ -1,0 +1,12 @@
+#!/bin/sh
+
+set -eu
+export LC_ALL=C
+
+NAME="${1:?}"; shift 1
+
+export RCLONE_CONFIG=/etc/rclone/rclone.conf
+export RESTIC_REPOSITORY_FILE=/etc/restic/"${NAME:?}"/repository
+export RESTIC_PASSWORD_FILE=/etc/restic/"${NAME:?}"/password
+
+restic "${@}"

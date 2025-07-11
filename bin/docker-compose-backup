@@ -6,6 +6,7 @@ export LC_ALL=C
 NAME="${1:?}"; shift 1
 
 COMPOSE_DIR="/etc/docker-compose/${NAME:?}"
+cd "${COMPOSE_DIR:?}"
 
 # Check if deployment is active
 systemctl is-active -q docker-compose@"${NAME:?}".service && IS_ACTIVE=1 || IS_ACTIVE=0
@@ -15,7 +16,7 @@ systemctl stop docker-compose@"${NAME:?}".service
 docker compose --project-directory "${COMPOSE_DIR:?}" rm --stop --volumes --force >/dev/null 2>&1
 
 # Backup deployment
-{
+(
 	export RCLONE_CONFIG=/etc/rclone/rclone.conf
 	export RESTIC_REPOSITORY_FILE=/etc/restic/"${NAME:?}"/repository
 	export RESTIC_PASSWORD_FILE=/etc/restic/"${NAME:?}"/password
@@ -31,7 +32,7 @@ docker compose --project-directory "${COMPOSE_DIR:?}" rm --stop --volumes --forc
 
 	printf '%s\n' 'Backup complete!'
 	restic stats
-}
+)
 
 # Start deployment
 if [ "${IS_ACTIVE:?}" = '1' ]; then

@@ -15,7 +15,7 @@ trap 'ret="$?"; rm -rf -- "${TMP_DIR:?}"; trap - EXIT; exit "${ret:?}"' EXIT TER
 main() {
 	mkdir "${TMP_DIR:?}"/bin/
 	curl --proto '=https' --tlsv1.3 -L \
-		-o "${TMP_DIR:?}"/bin/'#1-#2' "${BASE_URL:?}"/bin/'{docker-compose}-{restart,start,stop,backup,restic}' \
+		-o "${TMP_DIR:?}"/bin/'#1-#2' "${BASE_URL:?}"/bin/'{docker-compose}-{restart,start,stop,update,backup,restic}' \
 		-o "${TMP_DIR:?}"/bin/'#1-#2' "${BASE_URL:?}"/bin/'{docker-compose}-{helpers-upgrade}'
 
 	mv -f "${TMP_DIR:?}"/bin/* "${BIN_DIR:?}"/
@@ -31,6 +31,7 @@ main() {
 		mkdir "${TMP_DIR:?}"/systemd/
 		curl --proto '=https' --tlsv1.3 -L \
 			-o "${TMP_DIR:?}"/systemd/'#1.#2' "${BASE_URL:?}"/systemd/'{docker-compose@}.{service}' \
+			-o "${TMP_DIR:?}"/systemd/'#1.#2' "${BASE_URL:?}"/systemd/'{docker-compose-update@}.{service,timer}' \
 			-o "${TMP_DIR:?}"/systemd/'#1.#2' "${BASE_URL:?}"/systemd/'{docker-compose-backup@}.{service,timer}'
 
 		mv -f "${TMP_DIR:?}"/systemd/* "${SYSTEMDUNIT_DIR:?}"/

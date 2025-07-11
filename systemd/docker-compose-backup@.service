@@ -5,4 +5,4 @@ Description=docker-compose-backup %i service
 Type=oneshot
 Environment=HOME=%h
 ExecStart=/usr/local/bin/docker-compose-backup '%i'
-TimeoutSec=180m
+TimeoutSec=75m

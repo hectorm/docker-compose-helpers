@@ -1,0 +1,8 @@
+[Unit]
+Description=docker-compose-update %i service
+
+[Service]
+Type=oneshot
+Environment=HOME=%h
+ExecStart=/usr/local/bin/docker-compose-update '%i'
+TimeoutSec=60m

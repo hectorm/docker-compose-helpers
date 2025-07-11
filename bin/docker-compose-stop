@@ -3,5 +3,5 @@
 set -eu
 export LC_ALL=C
 
-docker compose stop "${@}"
-exec docker compose rm --volumes --force
+docker compose stop --remove-orphans "${@}"
+docker compose rm --volumes --force

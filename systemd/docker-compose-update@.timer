@@ -1,0 +1,10 @@
+[Unit]
+Description=docker-compose-update %i timer
+
+[Timer]
+OnCalendar=*-*-* 06:30:00
+RandomizedDelaySec=10m
+Unit=docker-compose-update@%i.service
+
+[Install]
+WantedBy=timers.target

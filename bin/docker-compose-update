@@ -13,7 +13,7 @@ COMPOSE_TMP_DIR="$(mktemp -up /etc/docker-compose/ "${NAME:?}".XXXXXX)"
 trap 'ret="$?"; rm -rf -- "${COMPOSE_TMP_DIR:?}"; trap - EXIT; exit "${ret:?}"' EXIT TERM INT HUP
 
 # Preflight checks
-(
+{
 	if ! docker compose --project-directory "${COMPOSE_DIR:?}" config -q; then
 		printf '%s\n' 'Invalid Docker Compose configuration.' >&2
 		exit 1
@@ -50,7 +50,7 @@ trap 'ret="$?"; rm -rf -- "${COMPOSE_TMP_DIR:?}"; trap - EXIT; exit "${ret:?}"' 
 	printf '%s\n' 'Pulling and building images...'
 	docker compose --project-directory "${COMPOSE_TMP_DIR:?}" pull --ignore-buildable
 	docker compose --project-directory "${COMPOSE_TMP_DIR:?}" build --pull
-)
+}
 
 # Check if deployment is active
 systemctl is-active -q docker-compose@"${NAME:?}".service && IS_ACTIVE=1 || IS_ACTIVE=0
